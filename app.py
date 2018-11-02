@@ -63,7 +63,7 @@ def update_task(task_id):
     if len(task) == 0:
         abort(404)
     if not request.json:
-        abort(400)
+        abort(400) 
     if 'title' in request.json and not(isinstance(request.json['title'],str)):
         abort(400)
     if 'description' in request.json and not(isinstance(request.json['description'],str)):
