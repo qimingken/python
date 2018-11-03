@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 tasks = [
     { 
-        'id': 1,
+        'id': 0,
         'title': 'Buy groceries',
         'description': 'Milk, Cheese, Pizza, Fruit, Tylenol',
         'done': False
