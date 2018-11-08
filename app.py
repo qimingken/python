@@ -1,7 +1,83 @@
 #!/usr/bin/env python3
-from flask import Flask, jsonify,abort,make_response,request,url_for
-
+from flask import Flask,jsonify,abort,make_response,request,url_for,render_template
+import pymssql
 app = Flask(__name__)
+
+class MSSQL:
+    def __init__(self,host,user,pwd,db):
+        self.host = host
+        self.user = user
+        self.pwd = pwd
+        self.db = db
+
+    def __GetConnect(self):
+        if not self.db:
+            raise(NameError,"没有设置数据库信息")
+        self.conn = pymssql.connect(host=self.host,user=self.user,password=self.pwd,database=self.db,charset="utf8")
+        cur = self.conn.cursor()
+        if not cur:
+            raise(NameError,"连接数据库失败")
+        else:
+            return cur
+
+    def ExecQuery(self,sql):
+        cur = self.__GetConnect()
+        cur.execute(sql)
+        resList = cur.fetchall()
+
+        #查询完毕后必须关闭连接
+        self.conn.close()
+        return resList
+
+    def ExecNonQuery(self,sql):
+        cur = self.__GetConnect()
+        cur.execute(sql)
+        self.conn.commit()
+        self.conn.close()
+
+
+
+
+def Getdata(bookinglistno):    
+    ms = MSSQL(host="192.168.200.2",user="sa",pwd="",db="bookinfo")
+    if bookinglistno == None:
+        reslist = None
+    else:
+        sqlconfirm = "select * from bookinglistinfo where BookinglistNo = '"+ bookinglistno +"'" 
+        reslist = ms.ExecQuery(sqlconfirm)
+        for i in reslist:
+            print(i)
+            return i
+    
+
+
+@app.route('/',methods=['GET'])
+def home():
+    return render_template('index.html')
+
+@app.route('/',methods=['POST'])
+def getresult():
+    print('testPost')
+    print(request.form['bookinglistnoinput'])
+    getlistno = request.form['bookinglistnoinput']
+    aaa = Getdata(getlistno)
+
+    return render_template('index.html',bookinglistnoinput = getlistno,  result = aaa)
+    """return jsonify(aaa)
+
+
+newsql="update webuser set name='%s' where id=1"%u'测试'
+print newsql
+ms.ExecNonQuery(newsql.encode('utf-8')) """
+
+
+
+
+
+
+
+
+
 
 tasks = [
     { 
@@ -82,8 +158,6 @@ def delete_task(task_id):
         abort(404)
     tasks.remove(task[0])
     return jsonify({'result': True})
-
-
 
 
 if __name__ == '__main__':
