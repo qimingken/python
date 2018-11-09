@@ -24,10 +24,23 @@ class MSSQL:
         cur = self.__GetConnect()
         cur.execute(sql)
         resList = cur.fetchall()
+        description = cur.description
+
+        descriptionlist = []  
+        datalisttmp = []
+        datalist = []
+        for i in description:
+             descriptionlist.append(i[0])
+        for i in resList:
+            datalisttmp = []
+            for j in i:
+                datalisttmp.append(j)
+            datalist.append(datalisttmp)
 
         #查询完毕后必须关闭连接
         self.conn.close()
-        return resList
+        result = [descriptionlist,datalist]
+        return result
 
     def ExecNonQuery(self,sql):
         cur = self.__GetConnect()
@@ -40,14 +53,27 @@ class MSSQL:
 
 def Getdata(bookinglistno):    
     ms = MSSQL(host="192.168.200.2",user="sa",pwd="",db="bookinfo")
-    if bookinglistno == None:
+    if bookinglistno == None or bookinglistno == '':
         reslist = None
+        return []
     else:
-        sqlconfirm = "select * from bookinglistinfo where BookinglistNo = '"+ bookinglistno +"'" 
+        sqlconfirm = "SELECT BookingBarNo,BookingType,BookingName,BookingTime from BookingInfo where BookingBarNo = '"+ bookinglistno +"'" 
         reslist = ms.ExecQuery(sqlconfirm)
-        for i in reslist:
-            print(i)
-            return i
+        if reslist[1] != []:              
+            j = 0
+            while j < len(reslist[0]):
+                if reslist[0][j] == "BookingBarNo":
+                    reslist[0][j] = "产品条码"
+                elif  reslist[0][j] == "BookingType":
+                    reslist[0][j] = "产品型号"
+                elif  reslist[0][j] == "BookingName":
+                    reslist[0][j] = "产品名称"
+                elif  reslist[0][j] == "BookingTime":
+                    reslist[0][j] = "出库日期"
+                j = j+1
+            return reslist
+        else:
+            return []
     
 
 

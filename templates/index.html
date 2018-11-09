@@ -1,5 +1,39 @@
 <form method="post">
-    <p><input name="bookinglistnoinput" value="{{bookinglistnoinput}}"></p>
-    <p><button type="submit">查询</button></p>
-    <h1>{{ result }}</h1>
-    </form>
+
+    <div>
+        <div style="padding:20px 0 20px 7px;color:#333;margin-bottom: 20px;background:#f4f4f4">
+            <table>
+                <tr>
+                    <td><span style="margin-left:20px"> 产品条码查询：</span></td>
+                    <td>
+                        <p><input name="bookinglistnoinput" value="{{bookinglistnoinput}}" style="width:200px;margin-right:10px;"></p>
+                    </td>
+                    <td>
+                        <p><button type="submit" style="width:50px;">查询</button></p>
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+    </div>
+
+    <table>
+        {% for i in result %}
+        {% if i == result[0]: %}
+        <tr>
+            {% for j in i %}
+            <td align="center"> {{j}} </td>
+            {% endfor %}
+        </tr>
+        {% else: %}
+        {% for j in i %}
+        <tr>
+            {% for k in j %}
+            <td align="center"> {{k}} </td>
+            {% endfor %}
+            {% endfor %}
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </table>
+</form>
